@@ -4,7 +4,7 @@ name: Generate and Release End-of-Life Data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 0"
+    - cron: "30 22 * * *"
 
 permissions:
   contents: write
