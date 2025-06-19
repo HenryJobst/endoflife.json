@@ -28,9 +28,6 @@ jobs:
       - name: Fetch end-of-life data
         run: python fetch_endoflife.py
 
-      - name: Upgrade GitHub CLI
-        run: sudo apt-get update && sudo apt-get install gh -y  
-
       - name: Set release tags
         id: vars
         run: |
@@ -42,8 +39,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG=${{ steps.vars.outputs.date_tag }}
+          gh release delete "$TAG" -y || true
           gh release create "$TAG" endoflife.json \
-            --clobber \
             --title "End-of-Life Data ($TAG)" \
             --notes "Automatisch generierte Übersicht der End-of-Life Daten."
 
@@ -52,7 +49,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG=${{ steps.vars.outputs.latest_tag }}
+          gh release delete "$TAG" -y || true
           gh release create "$TAG" endoflife.json \
-            --clobber \
             --title "End-of-Life Data (Latest)" \
             --notes "Immer aktuelle End-of-Life-Daten (automatisch generiert)."
