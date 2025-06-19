@@ -1,1 +1,52 @@
 
+name: Generate and Release End-of-Life Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 0"
+
+jobs:
+  release-endoflife:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch end-of-life data
+        run: python scripts/fetch_endoflife.py
+
+      - name: Set release tags
+        id: vars
+        run: |
+          echo "date_tag=endoflife-$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+          echo "latest_tag=latest" >> $GITHUB_OUTPUT
+
+      - name: Create versioned GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=${{ steps.vars.outputs.date_tag }}
+          gh release delete "$TAG" -y || true
+          gh release create "$TAG" endoflife.json \
+            --title "End-of-Life Data ($TAG)" \
+            --notes "Automatisch generierte Übersicht der End-of-Life Daten."
+
+      - name: Create/update 'latest' GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=${{ steps.vars.outputs.latest_tag }}
+          gh release delete "$TAG" -y || true
+          gh release create "$TAG" endoflife.json \
+            --title "End-of-Life Data (Latest)" \
+            --notes "Immer aktuelle End-of-Life-Daten (automatisch generiert)."
