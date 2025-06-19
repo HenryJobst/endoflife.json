@@ -28,6 +28,9 @@ jobs:
       - name: Fetch end-of-life data
         run: python fetch_endoflife.py
 
+      - name: Upgrade GitHub CLI
+        run: sudo apt-get update && sudo apt-get install gh -y  
+
       - name: Set release tags
         id: vars
         run: |
