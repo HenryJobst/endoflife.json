@@ -23,7 +23,7 @@ jobs:
         run: pip install requests
 
       - name: Fetch end-of-life data
-        run: python scripts/fetch_endoflife.py
+        run: python fetch_endoflife.py
 
       - name: Set release tags
         id: vars
